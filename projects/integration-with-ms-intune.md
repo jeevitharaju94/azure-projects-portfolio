@@ -1,0 +1,1 @@
+# Automating certificate delivery by integrating with Microsoft Intune
