@@ -1,4 +1,4 @@
-# ☁️ Azure Projects Portfolio
+# ☁️ Azure Integration and Architecture Portfolio
 
 ### Azure Integration Engineer | C# / .NET | Microsoft 365 | DevOps
 
@@ -14,7 +14,7 @@ My focus is on building solutions that are **secure, scalable, maintainable, obs
 
 I am an Azure Integration and .NET developer focused on designing and developing enterprise applications and integration solutions using Microsoft Azure and Microsoft 365.
 
-My core areas include:
+## Focus Areas
 
 * Azure Integration Services
 * C# / .NET
@@ -40,168 +40,13 @@ My core areas include:
 
 # 🚀 Featured Projects
 
-## 1. Enterprise integration with Dynamics 365 and External Suppliers
-
-**Azure API Management +  Azure Logic Apps Standard + Service Bus**
-
-
-➡️ **[View Project](./projects/dynamics365-integration.md)**
-
----
-
-# 🛠️ Technology Stack
-
-### Azure
-
-![Azure](https://img.shields.io/badge/Azure-0089D6?style=for-the-badge\&logo=microsoftazure\&logoColor=white)
-
-* API Management
-* Functions
-* Logic Apps
-* Service Bus
-* Key Vault
-* Application Insights
-* Azure Monitor
-* Data Factory
-* ADLS Gen2
-* Azure SQL
-
----
-
-### Development
-
-![C#](https://img.shields.io/badge/C%23-239120?style=for-the-badge\&logo=csharp\&logoColor=white)
-![.NET](https://img.shields.io/badge/.NET-512BD4?style=for-the-badge\&logo=dotnet\&logoColor=white)
-
-* C#
-* .NET
-* ASP.NET Core
-* REST APIs
-* JavaScript
-* TypeScript
-* React
-
-# 🔐 Security
-
-Key security practices demonstrated in these projects:
-
-* Microsoft Entra ID authentication
-* OAuth 2.0
-* JWT validation
-* Managed Identity
-* Azure Key Vault
-* Azure RBAC
-* Least-privilege access
-* HTTPS
-* API validation
-* Secret management
-* Logging and auditing
-
----
-
-# 📈 Monitoring & Observability
-
-The projects demonstrate centralized monitoring using:
-
-* Application Insights
-* Azure Monitor
-* Log Analytics
-* Kusto Query Language (KQL)
-* Correlation IDs
-
----
-
-# 🏗️ Infrastructure as Code
-
-Azure resources are provisioned using **Bicep** wherever possible.
-
-Example structure:
-
-```text
-infrastructure/
-│
-├── main.bicep
-├── apim.bicep
-├── functionapp.bicep
-├── servicebus.bicep
-├── keyvault.bicep
-├── monitoring.bicep
-└── parameters/
-    ├── dev.json
-    └── prod.json
-```
-
-This allows infrastructure to be:
-
-* Version controlled
-* Repeatable
-* Consistent
-* Reviewable
-* Automated through CI/CD
-
----
-
-### DevOps
-
-* Azure DevOps
-* Azure Pipelines
-* YAML
-* Bicep
-* Azure CLI
-* Git
-
-### Microsoft 365
-
-* Microsoft Graph
-* SharePoint Online
-* SPFx
-* Dataverse
-* Dynamics 365
-* Power Platform
-
-
-
----
-
-# 📚 Architecture Patterns Demonstrated
-
-The portfolio focuses on practical enterprise integration patterns such as:
-
-### API Gateway
-
-```text
-Client → APIM → Backend API
-```
-
-### Asynchronous Messaging
-
-```text
-Producer → Service Bus → Consumer
-```
-
-### Event-Driven Integration
-
-```text
-Event → Topic → Multiple Consumers
-```
-
-### Serverless Integration
-
-```text
-API/Event → Azure Function → Service
-```
-
-### Secure Azure-to-Azure Communication
-
-```text
-Managed Identity → RBAC → Azure Resource
-```
-
-### Infrastructure as Code
-
-```text
-Bicep → Azure Resource Manager → Azure Infrastructure
-```
+| Project | Focus |
+|----------|----------|
+| [Enterprise Integration with Dynamics 365 CRM](/projects/project-integration-with-crm/project-info.md) | Event Hubs |
+| Web Application to manage Directory Information for Users and Groups | APIM |
+| Microsoft 365 Enterprise Information Lifecycle Management | Logic Apps |
+| Observability Platform | Monitoring |
+| Secure Landing Zone | Governance |
 
 ---
 
