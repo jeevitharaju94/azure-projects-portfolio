@@ -5,7 +5,6 @@ Provide visibility into storage consumption across SharePoint, Microsoft Teams, 
 ![M365 data governance architecture](./architecture.svg)
 
 ## Architecture flow
-
 1. Azure Functions and Logic Apps use Microsoft Entra ID to authenticate to Microsoft 365 services in order to retrieve service and storage data for all Microsoft 365 services.
 2. The collected data is loaded into a SQL database for analysis.
 3. Azure Synapse extracts and transforms the data, then loads the refined results into SQL.
