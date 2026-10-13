@@ -40,13 +40,11 @@ I am an Azure Integration and .NET developer focused on designing and developing
 
 # 🚀 Featured Projects
 
-| Project | Focus |
-|----------|----------|
-| [Enterprise Integration with Dynamics 365 CRM](/projects/project-integration-with-crm/project-info.md) | Event Hubs |
-| Web Application to manage Directory Information for Users and Groups | APIM |
-| Microsoft 365 Enterprise Information Lifecycle Management | Logic Apps |
-| Observability Platform | Monitoring |
-| Secure Landing Zone | Governance |
+| Project | Focus | Architecture |
+|----------|----------|----------|
+| [Enterprise Integration with Dynamics 365 CRM](./projects/project-integration-with-crm/project-info.md) | Secure supplier integration using API Management, Logic Apps, Dynamics 365, Service Bus, and Entra ID | [Architecture diagram](./projects/project-integration-with-crm/project-md365.drawio.png) |
+| [Microsoft 365 Data Governance and Group Lifecycle Management](./projects/M365-data-governance/project-info.md) | SharePoint, Teams, and M365 Groups storage insights; inactivity-based group expiry with owner renewal or deletion; Azure Functions, Logic Apps, Synapse, SQL, Key Vault, monitoring, and CI/CD | [Data governance](./projects/M365-data-governance/architecture.svg) · [Data lifecycle](./projects/M365-data-governance/lifecycle-management.svg) |
+
 
 ---
 

@@ -1,0 +1,88 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="700" viewBox="0 0 1200 700" role="img" aria-labelledby="title desc">
+  <title id="title">M365 data governance architecture</title>
+  <desc id="desc">SharePoint, Teams, and Microsoft 365 Groups data is retrieved by authenticated Azure Functions and Logic Apps, loaded into SQL, refined with Azure Synapse Analytics, and consumed by reporting applications. Key Vault manages secrets, Azure Monitor and Log Analytics collect logs, and Azure DevOps CI/CD pipelines deploy the solution.</desc>
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L10,5 L0,10 z" fill="#536579"/>
+    </marker>
+    <style>
+      text { font-family: "Segoe UI", Arial, sans-serif; fill: #172b4d; }
+      .heading { font-size: 25px; font-weight: 700; }
+      .subheading { font-size: 14px; fill: #536579; }
+      .card-title { font-size: 17px; font-weight: 700; }
+      .card-copy { font-size: 13px; fill: #42526e; }
+      .label { font-size: 12px; fill: #536579; }
+      .card { stroke-width: 2; rx: 14; }
+      .flow { fill: none; stroke: #536579; stroke-width: 2.5; marker-end: url(#arrow); }
+      .support-flow { fill: none; stroke: #7b8794; stroke-width: 1.8; stroke-dasharray: 6 5; marker-end: url(#arrow); }
+    </style>
+  </defs>
+
+  <rect width="1200" height="700" fill="#f7f9fc"/>
+  <text x="600" y="48" text-anchor="middle" class="heading">M365 Data Governance</text>
+  <text x="600" y="74" text-anchor="middle" class="subheading">Collect, refine, and report on Microsoft 365 storage consumption</text>
+
+  <rect x="45" y="155" width="215" height="210" class="card" fill="#ffffff" stroke="#8c9bab"/>
+  <text x="152" y="188" text-anchor="middle" class="card-title">Microsoft 365</text>
+  <rect x="66" y="210" width="173" height="38" rx="8" fill="#e8f2ff"/>
+  <text x="152" y="234" text-anchor="middle" class="card-copy">SharePoint</text>
+  <rect x="66" y="260" width="173" height="38" rx="8" fill="#e8f2ff"/>
+  <text x="152" y="284" text-anchor="middle" class="card-copy">Microsoft Teams</text>
+  <rect x="66" y="310" width="173" height="38" rx="8" fill="#e8f2ff"/>
+  <text x="152" y="334" text-anchor="middle" class="card-copy">M365 Groups</text>
+
+  <rect x="335" y="178" width="220" height="165" class="card" fill="#eef8ff" stroke="#1683c4"/>
+  <text x="445" y="216" text-anchor="middle" class="card-title">Data retrieval</text>
+  <text x="445" y="252" text-anchor="middle" class="card-copy">Azure Functions</text>
+  <text x="445" y="279" text-anchor="middle" class="card-copy">Azure Logic Apps</text>
+  <text x="445" y="319" text-anchor="middle" class="label">Collect service and storage data</text>
+
+  <rect x="630" y="178" width="200" height="165" class="card" fill="#f1efff" stroke="#7666c3"/>
+  <text x="730" y="216" text-anchor="middle" class="card-title">SQL database</text>
+  <text x="730" y="252" text-anchor="middle" class="card-copy">Collected data</text>
+  <text x="730" y="319" text-anchor="middle" class="label">Analysis and refinement input</text>
+
+  <rect x="905" y="155" width="250" height="210" class="card" fill="#eefaf4" stroke="#2c9a68"/>
+  <text x="1030" y="192" text-anchor="middle" class="card-title">Azure Synapse</text>
+  <text x="1030" y="220" text-anchor="middle" class="card-copy">Extract and transform</text>
+  <path d="M945 244 H1115" stroke="#c6d8ce" stroke-width="1"/>
+  <text x="1030" y="275" text-anchor="middle" class="card-copy">Load refined data to SQL</text>
+  <text x="1030" y="329" text-anchor="middle" class="label">Analytics and transformation</text>
+
+  <path d="M270 260 H323" class="flow"/>
+  <text x="296" y="242" text-anchor="middle" class="label">retrieve</text>
+  <path d="M565 260 H618" class="flow"/>
+  <text x="591" y="242" text-anchor="middle" class="label">load</text>
+  <path d="M840 260 H893" class="flow"/>
+  <text x="866" y="242" text-anchor="middle" class="label">extract</text>
+
+  <rect x="610" y="420" width="245" height="76" rx="12" fill="#ffffff" stroke="#7666c3" stroke-width="1.5"/>
+  <text x="732" y="451" text-anchor="middle" class="card-title">Refined SQL data</text>
+  <text x="732" y="476" text-anchor="middle" class="card-copy">Curated governance dataset</text>
+  <rect x="925" y="420" width="230" height="76" rx="12" fill="#ffffff" stroke="#2c9a68" stroke-width="1.5"/>
+  <text x="1040" y="451" text-anchor="middle" class="card-title">Reporting apps</text>
+  <text x="1040" y="476" text-anchor="middle" class="card-copy">Insights and opportunities</text>
+  <path d="M1030 376 V396 H732 V408" class="flow"/>
+  <path d="M867 458 H913" class="flow"/>
+
+  <rect x="45" y="525" width="340" height="76" rx="12" fill="#ffffff" stroke="#1683c4" stroke-width="1.5"/>
+  <text x="215" y="555" text-anchor="middle" class="card-title">Azure AD (Microsoft Entra ID)</text>
+  <text x="215" y="580" text-anchor="middle" class="card-copy">Authentication for Microsoft 365 data access</text>
+  <rect x="430" y="525" width="340" height="76" rx="12" fill="#ffffff" stroke="#d89b22" stroke-width="1.5"/>
+  <text x="600" y="555" text-anchor="middle" class="card-title">Azure Key Vault</text>
+  <text x="600" y="580" text-anchor="middle" class="card-copy">Application secrets and credentials</text>
+  <rect x="815" y="525" width="340" height="76" rx="12" fill="#ffffff" stroke="#7666c3" stroke-width="1.5"/>
+  <text x="985" y="555" text-anchor="middle" class="card-title">Azure Monitor + Log Analytics</text>
+  <text x="985" y="580" text-anchor="middle" class="card-copy">Operational logs and monitoring</text>
+
+  <path d="M215 515 V462 H335 V343" class="support-flow"/>
+  <path d="M600 515 V480 H445 V354" class="support-flow"/>
+  <path d="M985 515 V385 H1030 V365" class="support-flow"/>
+  <path d="M985 515 V395 H730 V354" class="support-flow"/>
+
+  <rect x="335" y="625" width="530" height="54" rx="12" fill="#edf1f5" stroke="#697b8c" stroke-width="1.5"/>
+  <text x="600" y="649" text-anchor="middle" class="card-title">Azure DevOps CI/CD pipelines</text>
+  <text x="600" y="670" text-anchor="middle" class="card-copy">Build and deploy application and analytics components</text>
+  <path d="M335 652 H300 V385 H445 V354" class="support-flow"/>
+  <path d="M865 652 H1175 V385 H1030 V376" class="support-flow"/>
+</svg>

@@ -1,0 +1,108 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1500" height="920" viewBox="0 0 1500 920" role="img" aria-labelledby="title desc">
+  <title id="title">Microsoft 365 Group lifecycle management architecture</title>
+  <desc id="desc">A scheduled Azure lifecycle process checks Microsoft 365 Group activity against a configurable expiration policy, notifies owners before expiry, authenticates renewal or deletion actions, and applies the configured expiry action when no response is received. Microsoft Entra ID, Key Vault, monitoring, and Azure DevOps support the workflow.</desc>
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L10,5 L0,10 z" fill="#536579"/>
+    </marker>
+    <style>
+      text { font-family: "Segoe UI", Arial, sans-serif; fill: #172b4d; }
+      .heading { font-size: 26px; font-weight: 700; }
+      .subheading { font-size: 14px; fill: #536579; }
+      .card-title { font-size: 17px; font-weight: 700; }
+      .card-copy { font-size: 13px; fill: #42526e; }
+      .label { font-size: 12px; fill: #536579; }
+      .flow { fill: none; stroke: #536579; stroke-width: 2.5; marker-end: url(#arrow); }
+      .support-flow { fill: none; stroke: #7b8794; stroke-width: 1.8; stroke-dasharray: 6 5; marker-end: url(#arrow); }
+    </style>
+  </defs>
+
+  <rect width="1500" height="920" fill="#f7f9fc"/>
+  <text x="750" y="48" text-anchor="middle" class="heading">Microsoft 365 Group Lifecycle Management</text>
+  <text x="750" y="75" text-anchor="middle" class="subheading">Detect inactivity, notify owners, and apply a governed renewal or expiry decision</text>
+
+  <rect x="465" y="105" width="570" height="112" rx="14" fill="#fff8e8" stroke="#d89b22" stroke-width="2"/>
+  <text x="750" y="137" text-anchor="middle" class="card-title">Configurable expiration policy</text>
+  <text x="750" y="165" text-anchor="middle" class="card-copy">Example: expire after 180 inactive days</text>
+  <text x="750" y="190" text-anchor="middle" class="card-copy">Reminders 90, 45, 30, 15, and 1 day before expiry · 30-day soft-delete recovery</text>
+
+  <rect x="40" y="270" width="225" height="165" rx="14" fill="#ffffff" stroke="#8c9bab" stroke-width="2"/>
+  <text x="152" y="307" text-anchor="middle" class="card-title">Microsoft 365 Groups</text>
+  <text x="152" y="342" text-anchor="middle" class="card-copy">Group and owner details</text>
+  <text x="152" y="369" text-anchor="middle" class="card-copy">Activity signals</text>
+  <text x="152" y="407" text-anchor="middle" class="label">Microsoft 365 / Graph</text>
+
+  <rect x="315" y="270" width="250" height="165" rx="14" fill="#eef8ff" stroke="#1683c4" stroke-width="2"/>
+  <text x="440" y="307" text-anchor="middle" class="card-title">Scheduled lifecycle check</text>
+  <text x="440" y="342" text-anchor="middle" class="card-copy">Azure Function timer trigger</text>
+  <text x="440" y="369" text-anchor="middle" class="card-copy">Read activity and owners</text>
+  <text x="440" y="407" text-anchor="middle" class="label">Runs on the configured schedule</text>
+
+  <rect x="615" y="270" width="250" height="165" rx="14" fill="#f1efff" stroke="#7666c3" stroke-width="2"/>
+  <text x="740" y="307" text-anchor="middle" class="card-title">Evaluate lifecycle policy</text>
+  <text x="740" y="342" text-anchor="middle" class="card-copy">Calculate inactivity and expiry</text>
+  <text x="740" y="369" text-anchor="middle" class="card-copy">Select due reminder or expiry</text>
+  <text x="740" y="407" text-anchor="middle" class="label">Track status and actions in SQL</text>
+
+  <rect x="915" y="270" width="230" height="165" rx="14" fill="#fff4e8" stroke="#d98a38" stroke-width="2"/>
+  <text x="1030" y="307" text-anchor="middle" class="card-title">Owner notification</text>
+  <text x="1030" y="342" text-anchor="middle" class="card-copy">Logic App sends email reminder</text>
+  <text x="1030" y="369" text-anchor="middle" class="card-copy">Secure Renew / Delete actions</text>
+  <text x="1030" y="407" text-anchor="middle" class="label">At configured reminder intervals</text>
+
+  <rect x="1195" y="270" width="265" height="165" rx="14" fill="#ffffff" stroke="#2c9a68" stroke-width="2"/>
+  <text x="1327" y="307" text-anchor="middle" class="card-title">Group owner</text>
+  <text x="1327" y="342" text-anchor="middle" class="card-copy">Reviews group and activity</text>
+  <text x="1327" y="369" text-anchor="middle" class="card-copy">Chooses Renew or Delete</text>
+  <text x="1327" y="407" text-anchor="middle" class="label">No response means policy expiry</text>
+
+  <path d="M265 352 H303" class="flow"/>
+  <path d="M565 352 H603" class="flow"/>
+  <path d="M865 352 H903" class="flow"/>
+  <path d="M1145 352 H1183" class="flow"/>
+  <path d="M740 217 V258" class="support-flow"/>
+
+  <text x="750" y="492" text-anchor="middle" class="card-title">Decision and outcome</text>
+  <path d="M1327 435 V475 H270 V510" class="flow"/>
+  <path d="M1327 475 H750 V510" class="flow"/>
+  <path d="M1327 475 H1230 V510" class="flow"/>
+  <text x="270" y="501" text-anchor="middle" class="label">Owner renews</text>
+  <text x="750" y="501" text-anchor="middle" class="label">Owner requests deletion</text>
+  <text x="1230" y="501" text-anchor="middle" class="label">No action by expiry</text>
+
+  <rect x="80" y="525" width="380" height="150" rx="14" fill="#eefaf4" stroke="#2c9a68" stroke-width="2"/>
+  <text x="270" y="562" text-anchor="middle" class="card-title">Renew group</text>
+  <text x="270" y="596" text-anchor="middle" class="card-copy">Authenticate and verify the owner</text>
+  <text x="270" y="623" text-anchor="middle" class="card-copy">Renew the group and reset its expiry status</text>
+  <text x="270" y="653" text-anchor="middle" class="label">Record the decision and next review</text>
+
+  <rect x="560" y="525" width="380" height="150" rx="14" fill="#fff4e8" stroke="#d98a38" stroke-width="2"/>
+  <text x="750" y="562" text-anchor="middle" class="card-title">Owner-requested deletion</text>
+  <text x="750" y="596" text-anchor="middle" class="card-copy">Authenticate and verify the owner</text>
+  <text x="750" y="623" text-anchor="middle" class="card-copy">Delete the group according to policy</text>
+  <text x="750" y="653" text-anchor="middle" class="label">Soft-deleted group can be restored during the recovery window</text>
+
+  <rect x="1040" y="525" width="380" height="150" rx="14" fill="#fff0f0" stroke="#c44848" stroke-width="2"/>
+  <text x="1230" y="562" text-anchor="middle" class="card-title">Expiry action</text>
+  <text x="1230" y="596" text-anchor="middle" class="card-copy">Apply configured action when the policy expires</text>
+  <text x="1230" y="623" text-anchor="middle" class="card-copy">Soft-delete group or set its SharePoint site read-only</text>
+  <text x="1230" y="653" text-anchor="middle" class="label">Restore a soft-deleted group within the configured recovery window</text>
+
+  <rect x="40" y="735" width="330" height="100" rx="12" fill="#ffffff" stroke="#1683c4" stroke-width="1.5"/>
+  <text x="205" y="773" text-anchor="middle" class="card-title">Microsoft Entra ID</text>
+  <text x="205" y="802" text-anchor="middle" class="card-copy">Authenticate owners and service identities</text>
+  <rect x="410" y="735" width="310" height="100" rx="12" fill="#ffffff" stroke="#d89b22" stroke-width="1.5"/>
+  <text x="565" y="773" text-anchor="middle" class="card-title">Azure Key Vault</text>
+  <text x="565" y="802" text-anchor="middle" class="card-copy">Protect application credentials and secrets</text>
+  <rect x="760" y="735" width="330" height="100" rx="12" fill="#ffffff" stroke="#7666c3" stroke-width="1.5"/>
+  <text x="925" y="773" text-anchor="middle" class="card-title">Azure Monitor + Log Analytics</text>
+  <text x="925" y="802" text-anchor="middle" class="card-copy">Monitor runs, decisions, and failures</text>
+  <rect x="1130" y="735" width="330" height="100" rx="12" fill="#edf1f5" stroke="#697b8c" stroke-width="1.5"/>
+  <text x="1295" y="773" text-anchor="middle" class="card-title">Azure DevOps CI/CD</text>
+  <text x="1295" y="802" text-anchor="middle" class="card-copy">Build and deploy lifecycle components</text>
+
+  <path d="M205 725 V690 H1327 V445" class="support-flow"/>
+  <path d="M565 725 V700 H740 V445" class="support-flow"/>
+  <path d="M925 725 V690 H1030 V445" class="support-flow"/>
+  <path d="M1295 725 V690 H440 V445" class="support-flow"/>
+</svg>
