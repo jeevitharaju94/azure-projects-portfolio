@@ -44,6 +44,16 @@ The supplied design shows an example policy of expiration after 180 days of inac
 - Azure Monitor and Log Analytics
 - Azure DevOps CI/CD pipelines
 
+# DevOps
+
+## Infrastructure
+
+[Bicep Modules for Infrastructure as Code](https://github.com/jeevitharaju94/azure-bicep-library/tree/main/infrastructure)
+
+## Pipelines
+
+[Azure DevOps CI/CD pipelines](https://github.com/jeevitharaju94/azure-bicep-library/tree/main/pipelines)
+
 # Outcome
 
 - Consolidated visibility into storage consumption across Microsoft 365 services
