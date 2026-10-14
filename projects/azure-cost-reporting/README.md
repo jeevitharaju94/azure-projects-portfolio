@@ -60,7 +60,7 @@ Cost Management data may arrive late and can be revised. The schedule retries th
 
 ## Configure
 
-From this project directory, copy `infrastructure/parameters/main.example.bicepparam` to `infrastructure/parameters/main.custom.bicepparam`. Update the sample values:
+ Update the  environment detials in `infrastructure/parameters/main.example.bicepparam` :
 
 ```bicep
 using '../main.bicep'
