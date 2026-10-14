@@ -13,7 +13,17 @@ azure-cost-reporting/
 │   │   ├── functionApp.bicep
 │   │   └── storageAccount.bicep
 │   └── parameters/
+│       ├── main.DEV.bicepparam
+│       ├── main.TEST.bicepparam
 │       └── main.example.bicepparam
+├── pipelines/
+│   ├── azure-pipeline.yaml
+│   ├── deploy-functionapp-pipeline.yaml
+│   ├── deploy-iac-pipeline.yaml
+│   └── shared-variables/
+│       ├── build-variables.yaml
+│       ├── env-DEV.yaml
+│       └── env-TEST.yaml
 ├── src/
 │   └── functionApp/
 │       ├── AzureCostReporting.csproj
@@ -60,7 +70,7 @@ Cost Management data may arrive late and can be revised. The schedule retries th
 
 ## Configure
 
- Update the  environment detials in `infrastructure/parameters/main.example.bicepparam` :
+Update the environment settings in `infrastructure/parameters/main.example.bicepparam`. For pipeline deployments, customize `main.DEV.bicepparam` and `main.TEST.bicepparam` as applicable:
 
 ```bicep
 using '../main.bicep'
@@ -84,9 +94,9 @@ param costTableName = 'MonthlyCosts'
 
 Use globally unique names for the Function App and Storage account. The Storage account name must contain 3-24 lowercase letters or digits. Azure Functions evaluates the six-field NCRONTAB schedule in UTC. The configured subscription list identifies which subscriptions are queried; the deployment identity needs Cost Management access to all of them.
 
-## Deploy to your Azure environment
+## Deploy manually to your Azure environment
 
-Run these commands from the `projects/azure-cost-reporting` directory. Choose a deployment subscription that is included in the `subscriptions` parameter; the main template grants Cost Management Reader to the Function identity in the subscription containing the deployment resource group.
+Run these commands from the project directory. Choose a deployment subscription that is included in the `subscriptions` parameter; the main template grants Cost Management Reader to the Function identity in the subscription containing the deployment resource group. Replace the example parameter file with your configured parameters file before deploying.
 
 ```powershell
 az login
@@ -111,6 +121,22 @@ Publish the Function from its project directory:
 Set-Location "src\functionApp"
 func azure functionapp publish "<function-app-name>"
 ```
+
+## Azure DevOps CI/CD
+
+The `pipelines` folder contains an Azure DevOps pipeline modeled on the structure used by the Azure Bicep library. It builds and validates the Bicep template, runs deployment validation and what-if, restores and tests the .NET solution, and packages both the infrastructure and Function App as pipeline artifacts.
+
+1. Create Azure Resource Manager service connections for DEV and TEST. The deployment identity needs permissions to create the resource group resources and role assignments in its deployment subscription.
+2. Edit `pipelines/shared-variables/env-DEV.yaml` and `env-TEST.yaml` with your service connection names, resource group names, and Function App names. The Function App name must match the one in the corresponding environment `.bicepparam` file.
+3. Replace the placeholder subscription IDs, globally unique resource names, and other settings in `infrastructure/parameters/main.DEV.bicepparam` and `main.TEST.bicepparam`.
+4. In Azure DevOps, create a pipeline pointing to `projects/azure-cost-reporting/pipelines/azure-pipeline.yaml`.
+5. Queue a run and choose the target environment and action:
+   - `none`: lint, validate, preview, test, and package without deploying application infrastructure. Validation creates the target resource group if it does not exist.
+   - `iac`: deploy the Bicep infrastructure.
+   - `functionapp`: publish the Function package to an already deployed Function App.
+   - `all`: deploy the infrastructure, then publish the Function package.
+
+The Bicep template grants Cost Management Reader on the deployment subscription. If the configured subscription list includes other subscriptions, grant the Function's managed identity Cost Management Reader on each of them as described in [Deploy manually](#deploy-manually-to-your-azure-environment). The environment variable files and parameter files are checked-in configuration examples; replace their sample values before running deployments.
 
 ## Local development and tests
 

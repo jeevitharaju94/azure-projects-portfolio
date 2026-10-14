@@ -1,0 +1,9 @@
+variables:
+  - name: resourceGroupName
+    value: rg-cost-report-dev
+  - name: serviceConnection
+    value: CostReport-DEV-Deployment
+  - name: parameterFile
+    value: main.DEV.bicepparam
+  - name: functionAppName
+    value: func-cost-report-dev-change-me

@@ -1,0 +1,5 @@
+variables:
+  - name: vmImage
+    value: ubuntu-latest
+  - name: projectRoot
+    value: projects/azure-cost-reporting

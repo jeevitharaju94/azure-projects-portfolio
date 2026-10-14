@@ -1,0 +1,205 @@
+name: $(Date:yyyyMMdd)$(Rev:.r)
+
+parameters:
+  - name: deployAction
+    displayName: Deploy action
+    type: string
+    default: none
+    values:
+      - none
+      - iac
+      - functionapp
+      - all
+
+  - name: deployEnvironment
+    displayName: Deploy to environment
+    type: string
+    default: DEV
+    values:
+      - DEV
+      - TEST
+
+  - name: location
+    displayName: Deployment resource group location
+    type: string
+    default: West Europe
+    values:
+      - West Europe
+
+trigger: none
+
+variables:
+  - template: shared-variables/build-variables.yaml
+  - template: shared-variables/env-${{ parameters.deployEnvironment }}.yaml
+  - name: deployAction
+    value: ${{ parameters.deployAction }}
+  - name: bicepDeploymentName
+    value: $(Build.BuildNumber)
+
+stages:
+  - stage: Lint
+    displayName: Lint Bicep
+    jobs:
+      - job: LintCode
+        displayName: Build Bicep template
+        pool:
+          vmImage: ${{ variables.vmImage }}
+        steps:
+          - script: az bicep build --file "$(projectRoot)/infrastructure/main.bicep"
+            displayName: Compile Bicep template
+
+  - stage: Validate
+    displayName: Validate infrastructure
+    dependsOn: Lint
+    jobs:
+      - job: ValidateBicep
+        displayName: Validate Bicep deployment
+        pool:
+          vmImage: ${{ variables.vmImage }}
+        steps:
+          - task: AzureCLI@2
+            displayName: Create resource group and validate deployment
+            inputs:
+              azureSubscription: $(serviceConnection)
+              scriptType: bash
+              scriptLocation: inlineScript
+              inlineScript: |
+                az group create \
+                  --name "$(resourceGroupName)" \
+                  --location "${{ parameters.location }}" \
+                  --tags Environment="${{ parameters.deployEnvironment }}"
+
+                az deployment group validate \
+                  --resource-group "$(resourceGroupName)" \
+                  --name "$(bicepDeploymentName)-validate" \
+                  --template-file "$(projectRoot)/infrastructure/main.bicep" \
+                  --parameters "$(projectRoot)/infrastructure/parameters/$(parameterFile)" \
+                  location="${{ parameters.location }}"
+
+  - stage: Preview
+    displayName: Preview Azure changes
+    dependsOn: Validate
+    jobs:
+      - job: PreviewAzureChanges
+        displayName: Run Bicep what-if
+        pool:
+          vmImage: ${{ variables.vmImage }}
+        steps:
+          - task: AzureCLI@2
+            displayName: Preview infrastructure deployment
+            inputs:
+              azureSubscription: $(serviceConnection)
+              scriptType: bash
+              scriptLocation: inlineScript
+              inlineScript: |
+                az deployment group what-if \
+                  --resource-group "$(resourceGroupName)" \
+                  --name "$(bicepDeploymentName)-whatif" \
+                  --template-file "$(projectRoot)/infrastructure/main.bicep" \
+                  --parameters "$(projectRoot)/infrastructure/parameters/$(parameterFile)" \
+                  location="${{ parameters.location }}"
+
+  - stage: Build
+    displayName: Build and package project
+    dependsOn: Preview
+    jobs:
+      - job: Build
+        displayName: Test and package Function and IaC
+        pool:
+          vmImage: ${{ variables.vmImage }}
+        steps:
+          - task: UseDotNet@2
+            displayName: Use .NET 8 SDK
+            inputs:
+              packageType: sdk
+              version: 8.x
+
+          - task: DotNetCoreCLI@2
+            displayName: Restore .NET projects
+            inputs:
+              command: restore
+              projects: $(projectRoot)/tests/AzureCostReporting.Tests/AzureCostReporting.Tests.csproj
+
+          - task: DotNetCoreCLI@2
+            displayName: Run unit tests
+            inputs:
+              command: test
+              projects: $(projectRoot)/tests/AzureCostReporting.Tests/AzureCostReporting.Tests.csproj
+              arguments: --configuration Release --no-restore
+
+          - task: DotNetCoreCLI@2
+            displayName: Publish Azure Function
+            inputs:
+              command: publish
+              publishWebProjects: false
+              projects: $(projectRoot)/src/functionApp/AzureCostReporting.csproj
+              arguments: --configuration Release --no-restore --output $(Build.ArtifactStagingDirectory)/functionapp
+              zipAfterPublish: false
+
+          - task: ArchiveFiles@2
+            displayName: Package Function App
+            inputs:
+              rootFolderOrFile: $(Build.ArtifactStagingDirectory)/functionapp
+              includeRootFolder: false
+              archiveType: zip
+              archiveFile: $(Build.ArtifactStagingDirectory)/functionapp.zip
+              replaceExistingArchive: true
+
+          - task: PublishPipelineArtifact@1
+            displayName: Publish Function App artifact
+            inputs:
+              targetPath: $(Build.ArtifactStagingDirectory)/functionapp.zip
+              artifact: functionapp
+
+          - task: CopyFiles@2
+            displayName: Stage Bicep infrastructure
+            inputs:
+              SourceFolder: $(Build.SourcesDirectory)/$(projectRoot)/infrastructure
+              Contents: '**'
+              TargetFolder: $(Build.ArtifactStagingDirectory)/iac
+
+          - task: PublishPipelineArtifact@1
+            displayName: Publish infrastructure artifact
+            inputs:
+              targetPath: $(Build.ArtifactStagingDirectory)/iac
+              artifact: iac
+
+  - stage: Deploy_Dev
+    displayName: Deploy to DEV
+    dependsOn: Build
+    condition: and(succeeded(), ne(variables.deployAction, 'none'), eq('${{ parameters.deployEnvironment }}', 'DEV'))
+    jobs:
+      - deployment: Deploy_to_Dev
+        displayName: Deploy cost reporting to DEV
+        strategy:
+          runOnce:
+            deploy:
+              steps:
+                - ${{ if or(eq(parameters.deployAction, 'iac'), eq(parameters.deployAction, 'all')) }}:
+                    - template: deploy-iac-pipeline.yaml
+                      parameters:
+                        deployEnvironment: ${{ parameters.deployEnvironment }}
+                        location: ${{ parameters.location }}
+
+                - ${{ if or(eq(parameters.deployAction, 'functionapp'), eq(parameters.deployAction, 'all')) }}:
+                    - template: deploy-functionapp-pipeline.yaml
+
+  - stage: Deploy_Test
+    displayName: Deploy to TEST
+    dependsOn: Build
+    condition: and(succeeded(), ne(variables.deployAction, 'none'), eq('${{ parameters.deployEnvironment }}', 'TEST'))
+    jobs:
+      - deployment: Deploy_to_Test
+        displayName: Deploy cost reporting to TEST
+        strategy:
+          runOnce:
+            deploy:
+              steps:
+                - ${{ if or(eq(parameters.deployAction, 'iac'), eq(parameters.deployAction, 'all')) }}:
+                    - template: deploy-iac-pipeline.yaml
+                      parameters:
+                        deployEnvironment: ${{ parameters.deployEnvironment }}
+                        location: ${{ parameters.location }}
+
+                - ${{ if or(eq(parameters.deployAction, 'functionapp'), eq(parameters.deployAction, 'all')) }}:
+                    - template: deploy-functionapp-pipeline.yaml

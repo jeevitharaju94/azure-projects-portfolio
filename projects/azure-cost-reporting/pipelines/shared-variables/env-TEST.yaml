@@ -1,0 +1,9 @@
+variables:
+  - name: resourceGroupName
+    value: rg-cost-report-test
+  - name: serviceConnection
+    value: CostReport-TEST-Deployment
+  - name: parameterFile
+    value: main.TEST.bicepparam
+  - name: functionAppName
+    value: func-cost-report-test-change-me
