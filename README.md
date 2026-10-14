@@ -29,10 +29,9 @@ I'm an Azure Integration and .NET developer building enterprise integrations wit
 
 | Project | Problem and solution | Links |
 |---|---|---|
-| **Azure Cost Reporting** | A .NET Azure Function collects the previous month's costs across configurable subscriptions and stores monthly summaries in Azure Table Storage. Includes reusable Bicep infrastructure and step-by-step instructions to deploy the solution into your own Azure environment. | [Project, customization and deployment guide](./projects/azure-cost-reporting/README.md) |
 | **Enterprise Integration with Dynamics 365 CRM** | Give external suppliers access to approved CRM functionality without exposing the CRM. Request-response via API Management and Logic Apps, plus event-driven messaging via Service Bus. | [Case study](./projects/project-integration-with-crm/project-info.md) · [Architecture](./projects/project-integration-with-crm/project-md365.drawio.png) |
 | **Microsoft 365 Data Governance & Group Lifecycle** | Storage insights across SharePoint, Teams and M365 Groups, plus owner-driven renewal or deletion of inactive groups. Azure Functions, Logic Apps, Synapse, SQL and Key Vault. | [Case study](./projects/M365-data-governance/project-info.md) · [Data governance](./projects/M365-data-governance/architecture.svg) · [Lifecycle](./projects/M365-data-governance/lifecycle-management.svg) |
-||||
+| **Azure Cost Reporting** | A .NET Azure Function collects the previous month's costs across configurable subscriptions and stores monthly summaries in Azure Table Storage. Includes reusable Bicep infrastructure and step-by-step instructions to deploy the solution into your own Azure environment. | [Project, customization and deployment guide](./projects/azure-cost-reporting/README.md)|
 
 ### Deploy Azure Cost Reporting in your own environment
 
