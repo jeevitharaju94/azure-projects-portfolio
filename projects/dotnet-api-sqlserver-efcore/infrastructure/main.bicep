@@ -1,26 +1,16 @@
 targetScope = 'resourceGroup'
 
-@description('Azure region for the function app and storage account.')
+@description('Azure region for the Web App and SQL database.')
 param location string = resourceGroup().location
 
 param env string
 
-@description('Globally unique Function App name.')
-param functionAppName string
+@description('Globally unique Azure App Service Web App name.')
+param webAppName string
 
-@description('Globally unique, 3-24 character lowercase storage account name.')
-param storageAccountName string
-
-@description('Subscriptions to report, each with subscriptionId and displayName.')
-param subscriptions array
-
-@description('Six-field NCRONTAB schedule. Azure Functions evaluates this in UTC.')
-param costReportSchedule string = '0 15 0 1-5 * *'
-
-@description('Azure Table Storage table used for monthly cost summaries.')
-param costTableName string = 'MonthlyCosts'
-
-var tableDataContributorRoleId = '0a9a7e1f-b9d0-4cc4-a60d-0319b160aaa3'
+@description('SQL administrator password. Supply this as a secure deployment parameter.')
+@secure()
+param sqlAdministratorLoginPassword string
 
 var defaultTags = {
     Environment: toUpper(env)
@@ -28,37 +18,28 @@ var defaultTags = {
     Project: 'DotnetApiSqlServerEfCore'
 }
 
-module storageAccountModule 'modules/storageAccount.bicep' = {
-  name: 'storageAccount'
+module webAppModule 'modules/webApp.bicep' = {
+  name: 'webApp'
   params: {
-    storageAccountName: storageAccountName
     location: location
-    env: 'test'
+    webAppName: webAppName
+    env: env
     defaultTags: defaultTags
-  }
-}
-
-module functionAppModule 'modules/functionApp.bicep' = {
-  name: 'functionApp'
-  params: {
-    location: location
-    functionAppName: functionAppName
-    storageAccountName: storageAccountModule.outputs.storageAccountName
-    costTableName: costTableName
-    subscriptions: subscriptions
-    costReportSchedule: costReportSchedule
+    connectionString: 'Server=tcp:${sqlDbModule.outputs.sqlServerFqdn},1433;Initial Catalog=${sqlDbModule.outputs.sqlDatabaseName};Persist Security Info=False;User ID=sqladmin;Password=${sqlAdministratorLoginPassword};MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;'
   }
 }
 
 module sqlDbModule 'modules/sqldb.bicep' = {
   name: 'sqlDb'
   params: {
-    sqlServerName: toLower('sqlserver-${functionAppName}')
-    sqlDatabaseName: toLower('sqldb-${functionAppName}')
+    sqlServerName: toLower('sqlserver-${webAppName}')
+    sqlDatabaseName: toLower('sqldb-${webAppName}')
     administratorLogin: 'sqladmin'
-    administratorLoginPassword: 'strongP@ssw0rd!' // In production, use a secure
+    administratorLoginPassword: sqlAdministratorLoginPassword
     location: location
     defaultTags: defaultTags
   }
 }
+
+output webAppUrl string = 'https://${webAppModule.outputs.defaultHostName}'
 

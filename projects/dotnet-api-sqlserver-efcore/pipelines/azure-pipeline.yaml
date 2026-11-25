@@ -8,7 +8,7 @@ parameters:
     values:
       - none
       - iac
-      - functionapp
+      - webapp
       - all
 
   - name: deployEnvironment
@@ -64,6 +64,11 @@ stages:
               scriptType: bash
               scriptLocation: inlineScript
               inlineScript: |
+                if [ -z "$SQL_ADMIN_PASSWORD" ] || [ "${SQL_ADMIN_PASSWORD:0:2}" = '$(' ]; then
+                  echo "Set the sqlAdministratorLoginPassword secret pipeline variable."
+                  exit 1
+                fi
+
                 az group create \
                   --name "$(resourceGroupName)" \
                   --location "${{ parameters.location }}" \
@@ -74,7 +79,10 @@ stages:
                   --name "$(bicepDeploymentName)-validate" \
                   --template-file "$(projectRoot)/infrastructure/main.bicep" \
                   --parameters "$(projectRoot)/infrastructure/parameters/$(parameterFile)" \
-                  location="${{ parameters.location }}"
+                  location="${{ parameters.location }}" \
+                  env="${{ parameters.deployEnvironment }}"
+            env:
+              SQL_ADMIN_PASSWORD: $(sqlAdministratorLoginPassword)
 
   - stage: Preview
     displayName: Preview Azure changes
@@ -92,27 +100,35 @@ stages:
               scriptType: bash
               scriptLocation: inlineScript
               inlineScript: |
+                if [ -z "$SQL_ADMIN_PASSWORD" ] || [ "${SQL_ADMIN_PASSWORD:0:2}" = '$(' ]; then
+                  echo "Set the sqlAdministratorLoginPassword secret pipeline variable."
+                  exit 1
+                fi
+
                 az deployment group what-if \
                   --resource-group "$(resourceGroupName)" \
                   --name "$(bicepDeploymentName)-whatif" \
                   --template-file "$(projectRoot)/infrastructure/main.bicep" \
                   --parameters "$(projectRoot)/infrastructure/parameters/$(parameterFile)" \
-                  location="${{ parameters.location }}"
+                  location="${{ parameters.location }}" \
+                  env="${{ parameters.deployEnvironment }}"
+            env:
+              SQL_ADMIN_PASSWORD: $(sqlAdministratorLoginPassword)
 
   - stage: Build
     displayName: Build and package project
     dependsOn: Preview
     jobs:
       - job: Build
-        displayName: Test and package Function and IaC
+        displayName: Test and package Order API and IaC
         pool:
           vmImage: ${{ variables.vmImage }}
         steps:
           - task: UseDotNet@2
-            displayName: Use .NET 8 SDK
+            displayName: Use .NET 10 SDK
             inputs:
               packageType: sdk
-              version: 8.x
+              version: 10.x
 
           - task: DotNetCoreCLI@2
             displayName: Restore .NET projects
@@ -128,28 +144,28 @@ stages:
               arguments: --configuration Release --no-restore
 
           - task: DotNetCoreCLI@2
-            displayName: Publish Azure Function
+            displayName: Publish Order API
             inputs:
               command: publish
               publishWebProjects: false
-              projects: $(projectRoot)/src/OrderApi/AzureCostReporting.csproj
-              arguments: --configuration Release --no-restore --output $(Build.ArtifactStagingDirectory)/functionapp
+              projects: $(projectRoot)/src/OrderApi/OrderApi.csproj
+              arguments: --configuration Release --no-restore --output $(Build.ArtifactStagingDirectory)/webapp
               zipAfterPublish: false
 
           - task: ArchiveFiles@2
-            displayName: Package Function App
+            displayName: Package Web App
             inputs:
-              rootFolderOrFile: $(Build.ArtifactStagingDirectory)/functionapp
+              rootFolderOrFile: $(Build.ArtifactStagingDirectory)/webapp
               includeRootFolder: false
               archiveType: zip
-              archiveFile: $(Build.ArtifactStagingDirectory)/functionapp.zip
+              archiveFile: $(Build.ArtifactStagingDirectory)/webapp.zip
               replaceExistingArchive: true
 
           - task: PublishPipelineArtifact@1
-            displayName: Publish Function App artifact
+            displayName: Publish Web App artifact
             inputs:
-              targetPath: $(Build.ArtifactStagingDirectory)/functionapp.zip
-              artifact: functionapp
+              targetPath: $(Build.ArtifactStagingDirectory)/webapp.zip
+              artifact: webapp
 
           - task: CopyFiles@2
             displayName: Stage Bicep infrastructure
@@ -170,7 +186,7 @@ stages:
     condition: and(succeeded(), ne(variables.deployAction, 'none'), eq('${{ parameters.deployEnvironment }}', 'DEV'))
     jobs:
       - deployment: Deploy_to_Dev
-        displayName: Deploy cost reporting to DEV
+        displayName: Deploy Order API to DEV
         strategy:
           runOnce:
             deploy:
@@ -181,8 +197,8 @@ stages:
                         deployEnvironment: ${{ parameters.deployEnvironment }}
                         location: ${{ parameters.location }}
 
-                - ${{ if or(eq(parameters.deployAction, 'functionapp'), eq(parameters.deployAction, 'all')) }}:
-                    - template: deploy-functionapp-pipeline.yaml
+                - ${{ if or(eq(parameters.deployAction, 'webapp'), eq(parameters.deployAction, 'all')) }}:
+                    - template: deploy-webapp-pipeline.yaml
 
   - stage: Deploy_Test
     displayName: Deploy to TEST
@@ -190,7 +206,7 @@ stages:
     condition: and(succeeded(), ne(variables.deployAction, 'none'), eq('${{ parameters.deployEnvironment }}', 'TEST'))
     jobs:
       - deployment: Deploy_to_Test
-        displayName: Deploy cost reporting to TEST
+        displayName: Deploy Order API to TEST
         strategy:
           runOnce:
             deploy:
@@ -201,5 +217,5 @@ stages:
                         deployEnvironment: ${{ parameters.deployEnvironment }}
                         location: ${{ parameters.location }}
 
-                - ${{ if or(eq(parameters.deployAction, 'functionapp'), eq(parameters.deployAction, 'all')) }}:
-                    - template: deploy-functionapp-pipeline.yaml
+                - ${{ if or(eq(parameters.deployAction, 'webapp'), eq(parameters.deployAction, 'all')) }}:
+                    - template: deploy-webapp-pipeline.yaml

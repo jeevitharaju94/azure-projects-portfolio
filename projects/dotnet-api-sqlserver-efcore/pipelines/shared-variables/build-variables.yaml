@@ -2,4 +2,4 @@ variables:
   - name: vmImage
     value: ubuntu-latest
   - name: projectRoot
-    value: projects/azure-cost-reporting
+    value: projects/dotnet-api-sqlserver-efcore

@@ -33,13 +33,21 @@ steps:
       scriptType: bash
       scriptLocation: inlineScript
       inlineScript: |
+        if [ -z "$SQL_ADMIN_PASSWORD" ] || [ "${SQL_ADMIN_PASSWORD:0:2}" = '$(' ]; then
+          echo "Set the sqlAdministratorLoginPassword secret pipeline variable."
+          exit 1
+        fi
+
         az deployment group create \
           --name "$(bicepDeploymentName)" \
           --mode Incremental \
           --resource-group "$(resourceGroupName)" \
           --template-file "$(Pipeline.Workspace)/iac/main.bicep" \
           --parameters "$(Pipeline.Workspace)/iac/parameters/$(parameterFile)" \
-          location="${{ parameters.location }}"
+          location="${{ parameters.location }}" \
+          env="${{ parameters.deployEnvironment }}"
+    env:
+      SQL_ADMIN_PASSWORD: $(sqlAdministratorLoginPassword)
 
   - task: AzureCLI@2
     displayName: Verify infrastructure deployment
@@ -60,9 +68,13 @@ steps:
           exit 1
         fi
 
-        principalId=$(az deployment group show \
+        webAppUrl=$(az deployment group show \
           --resource-group "$(resourceGroupName)" \
           --name "$(bicepDeploymentName)" \
-          --query properties.outputs.functionAppPrincipalId.value \
+          --query properties.outputs.webAppUrl.value \
           --output tsv)
-        echo "Function managed identity principal ID: ${principalId}"
+        if [ -z "${webAppUrl}" ]; then
+          echo "Web App URL was not returned by the infrastructure deployment."
+          exit 1
+        fi
+        echo "Order API Web App URL: ${webAppUrl}"

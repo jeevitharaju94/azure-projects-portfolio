@@ -1,0 +1,18 @@
+steps:
+  - checkout: none
+
+  - task: DownloadPipelineArtifact@2
+    displayName: Download Web App artifact
+    inputs:
+      source: current
+      artifact: webapp
+      path: $(Pipeline.Workspace)/webapp
+
+  - task: AzureWebApp@1
+    displayName: Deploy Order API to Azure Web App
+    inputs:
+      azureSubscription: $(serviceConnection)
+      appType: webApp
+      appName: $(webAppName)
+      package: $(Pipeline.Workspace)/webapp/webapp.zip
+      deploymentMethod: runFromPackage
