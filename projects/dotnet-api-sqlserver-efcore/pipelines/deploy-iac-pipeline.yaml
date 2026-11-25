@@ -1,0 +1,68 @@
+parameters:
+  - name: deployEnvironment
+    type: string
+  - name: location
+    type: string
+
+steps:
+  - checkout: none
+
+  - task: DownloadPipelineArtifact@2
+    displayName: Download infrastructure artifact
+    inputs:
+      source: current
+      artifact: iac
+      path: $(Pipeline.Workspace)/iac
+
+  - task: AzureCLI@2
+    displayName: Create resource group if missing
+    inputs:
+      azureSubscription: $(serviceConnection)
+      scriptType: bash
+      scriptLocation: inlineScript
+      inlineScript: |
+        az group create \
+          --name "$(resourceGroupName)" \
+          --location "${{ parameters.location }}" \
+          --tags Environment="${{ parameters.deployEnvironment }}"
+
+  - task: AzureCLI@2
+    displayName: Deploy Bicep infrastructure
+    inputs:
+      azureSubscription: $(serviceConnection)
+      scriptType: bash
+      scriptLocation: inlineScript
+      inlineScript: |
+        az deployment group create \
+          --name "$(bicepDeploymentName)" \
+          --mode Incremental \
+          --resource-group "$(resourceGroupName)" \
+          --template-file "$(Pipeline.Workspace)/iac/main.bicep" \
+          --parameters "$(Pipeline.Workspace)/iac/parameters/$(parameterFile)" \
+          location="${{ parameters.location }}"
+
+  - task: AzureCLI@2
+    displayName: Verify infrastructure deployment
+    inputs:
+      azureSubscription: $(serviceConnection)
+      scriptType: bash
+      scriptLocation: inlineScript
+      inlineScript: |
+        provisioningState=$(az deployment group show \
+          --resource-group "$(resourceGroupName)" \
+          --name "$(bicepDeploymentName)" \
+          --query properties.provisioningState \
+          --output tsv)
+
+        echo "Provisioning state: ${provisioningState}"
+        if [ "${provisioningState}" != "Succeeded" ]; then
+          echo "Infrastructure deployment failed."
+          exit 1
+        fi
+
+        principalId=$(az deployment group show \
+          --resource-group "$(resourceGroupName)" \
+          --name "$(bicepDeploymentName)" \
+          --query properties.outputs.functionAppPrincipalId.value \
+          --output tsv)
+        echo "Function managed identity principal ID: ${principalId}"

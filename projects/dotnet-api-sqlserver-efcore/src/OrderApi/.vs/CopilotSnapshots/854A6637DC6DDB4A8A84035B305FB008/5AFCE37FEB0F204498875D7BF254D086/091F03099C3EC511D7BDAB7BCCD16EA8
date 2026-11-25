@@ -1,0 +1,12 @@
+﻿{
+  "Logging": {
+    "LogLevel": {
+      "Default": "Information",
+      "Microsoft.AspNetCore": "Warning"
+    }
+  },
+  "ConnectionStrings": {
+    "DefaultConnection": "Server=localhost;Database=REDACTED_PROJECT_NAME;User Id=sa;Password=REDACTED_PASSWORD;Trusted_Connection=True;"
+  },
+  "AllowedHosts": "*"
+}
